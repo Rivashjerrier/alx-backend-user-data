@@ -6,7 +6,8 @@ filtered_logger.py module
 import re
 
 
-def filter_datum(fields, redaction, message, separator):
+def filter_datum(fields: List[str], redaction: str,
+                 message: str, separator: str) -> str:
     """
     filter_datum returns the log message obfuscated
     """
