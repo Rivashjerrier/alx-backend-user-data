@@ -64,18 +64,31 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     """
     Returns a connector to the database
     """
-    db_username = os.environ.get("PERSONAL_DATA_DB_USERNAME", "root")
-    db_password = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
-    db_host = os.environ.get("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = os.environ.get("PERSONAL_DATA_DB_NAME", "")
-    conn = mysql.connector.connect(
-            host=db_host,
-            user=db_username,
-            password=db_password,
-            database=db_name
-        )
-    return conn
+    return mysql.connector.connect(
+        db_host=os.environ.get("PERSONAL_DATA_DB_HOST", "localhost"),
+        db_username=os.environ.get("PERSONAL_DATA_DB_USERNAME", "root"),
+        db_password=os.environ.get("PERSONAL_DATA_DB_PASSWORD", ""),
+        db_name=os.environ.get("PERSONAL_DATA_DB_NAME", ""),
+    )
+
+
+def main():
+    """
+    Retrieves all rows from users table and display each row
+    in a filtered format
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users")
+    logger = get_logger()
+    rows = cursor.fetchall()
+    for row in rows:
+        fd_fields = {field: "***" if field in PII_FIELDS else value
+                     for field, value in zip(cursor.column_names, row)}
+        logger.info(fd_fields)
+    cursor.close()
+    db.close()
 
 
 if __name__ == "__main__":
-    db = get_db()
+    main()
