@@ -36,23 +36,13 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """
-        Adds a new user to the database
-        """
-        user = User(email=email, hashed_password=hashed_password)
-        self._session.add(user)
-        self._session.commit()
-        return user
-
-    def find_user_by(self, **kwargs) -> User:
-        """
-        Returns the first row found in the users table as filtered
-        by the method’s input arguments
+        Adds a user to the database
         """
         try:
-            user = self._session.query(User).filter_by(**kwargs).first()
-            if not user:
-                raise NoResultFound("Not found")
-            return user
-        except InvalidRequestError as exception:
+            user = User(email=email, hashed_password=hashed_password)
+            self._session.add(user)
+            self._session.commit()
+        except Exception:
             self._session.rollback()
-            raise exception
+            user = None
+        return user
