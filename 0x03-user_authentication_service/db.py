@@ -6,6 +6,7 @@ db.py module
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
@@ -47,7 +48,11 @@ class DB:
         Returns the first row found in the users table as filtered
         by the method’s input arguments
         """
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if user is None:
-            raise NoResultFound
-        return user
+        try:
+            user = self._session.query(User).filter_by(**kwargs).first()
+            if not user:
+                raise NoResultFound("Not found")
+            return user
+        except InvalidRequestError as exception:
+            self._session.rollback()
+            raise exception
