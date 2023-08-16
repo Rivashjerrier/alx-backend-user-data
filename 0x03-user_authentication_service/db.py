@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-db module
+db.py module
 """
 
 from sqlalchemy.exc import InvalidRequestError
